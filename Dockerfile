@@ -1,19 +1,18 @@
 FROM php:8.3-fpm
 
-# Dependencias del sistema
+# Dependencias sistema
 RUN apt-get update && apt-get install -y \
     git \
     curl \
     unzip \
+    zip \
     libpq-dev \
     libzip-dev \
     libicu-dev \
-    libpng-dev \
-    libjpeg-dev \
-    libfreetype6-dev \
-    zip
+    nodejs \
+    npm
 
-# Extensiones PHP necesarias para Laravel + Filament
+# Extensiones PHP
 RUN docker-php-ext-install \
     pdo \
     pdo_pgsql \
@@ -28,7 +27,14 @@ WORKDIR /var/www
 
 COPY . .
 
+# Instalar PHP deps
 RUN composer install --no-dev --optimize-autoloader
+
+# Instalar frontend
+RUN npm install
+
+# Compilar Vite
+RUN npm run build
 
 EXPOSE 10000
 
